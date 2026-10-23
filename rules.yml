@@ -1,0 +1,59 @@
+# AI use: the PromQL below was drafted with Claude Code. Prompts used (with a preceding "I need a PromQL prompt for the following functions:"):
+#   P1 "Recording rule: whole-machine CPU utilisation as a 0..1 ratio from node_exporter, 15s window (I scrape every 1s)."
+#   P2 "Recording rule: p95 of the captioner_inference_duration_seconds histogram over 1 minute."
+#   P3 "Alert when CPU is above 40% for 10 seconds, using the recording rule."
+#   P4 "Alert if p95 inference latency exceeds 10 seconds."
+#   P5 "Alert when more than 20% of images fail over the last minute; avoid divide by zero."
+
+groups:
+  - name: cpu-node
+    rules:
+      - record: node:cpu_utilisation:ratio                       # P1: 1 - average idle fraction
+        expr: 1 - avg(rate(node_cpu_seconds_total{mode="idle"}[15s]))
+
+      - record: captioner:inference_p95_seconds                  # P2
+        expr: histogram_quantile(0.95, sum by (le) (rate(captioner_inference_duration_seconds_bucket[1m])))
+
+  - name: captioner-alerts
+    rules:
+      - alert: CaptionerAppDown
+        expr: up{job="python_app"} == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Captioning app metrics endpoint is down"
+
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "node_exporter is down"
+
+      - alert: HighCPUDuringProcessing                           # P3
+        expr: node:cpu_utilisation:ratio > 0.4
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU above 40% for 10 s"
+
+      - alert: HighInferenceLatencyP95                           # P4
+        expr: captioner:inference_p95_seconds > 10
+        for: 20s
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 inference latency above 10 s"
+
+      - alert: HighImageErrorRatio                               # P5: the "> 0" drops the idle case
+        expr: |
+          sum(rate(captioner_images_processed_total{status="error"}[1m]))
+            / (sum(rate(captioner_images_processed_total[1m])) > 0) > 0.2
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 20% of images failing"

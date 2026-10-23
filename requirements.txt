@@ -1,0 +1,8 @@
+# torch is installed first by ./run.sh setup from the CPU-only index (no CUDA download).
+torch
+transformers
+streamlit>=1.45
+prometheus-client
+psutil
+pillow
+pandas

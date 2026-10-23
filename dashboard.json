@@ -1,0 +1,3725 @@
+{
+  "uid": "da3408-a4-captioner",
+  "title": "DA3408 A4 \u00b7 AI Image Captioner Observability (vrishab)",
+  "description": "CPU-only BLIP image captioner: health \u2192 application (RED) \u2192 clients \u2192 system (USE) \u2192 correlation. PromQL drafted with AI assistance; prompts logged in build_dashboard.py.",
+  "tags": [
+    "da3408",
+    "assignment-4",
+    "captioner",
+    "vrishab"
+  ],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m"
+    ]
+  },
+  "schemaVersion": 41,
+  "version": 1,
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "links": [
+    {
+      "title": "Streamlit app",
+      "type": "link",
+      "url": "http://localhost:8501",
+      "targetBlank": true,
+      "icon": "external link"
+    },
+    {
+      "title": "Prometheus targets",
+      "type": "link",
+      "url": "http://localhost:9090/targets",
+      "targetBlank": true,
+      "icon": "external link"
+    },
+    {
+      "title": "Prometheus alerts",
+      "type": "link",
+      "url": "http://localhost:9090/alerts",
+      "targetBlank": true,
+      "icon": "bolt"
+    },
+    {
+      "title": "App /metrics",
+      "type": "link",
+      "url": "http://localhost:18000/metrics",
+      "targetBlank": true,
+      "icon": "doc"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "name": "Alerts firing",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds}"
+        },
+        "enable": true,
+        "iconColor": "#D55E00",
+        "expr": "ALERTS{alertstate=\"firing\"}",
+        "titleFormat": "{{alertname}}",
+        "step": "5s"
+      }
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "ds",
+        "label": "Prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "refresh": 1,
+        "hide": 0,
+        "current": {},
+        "options": [],
+        "regex": ""
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "How to read this dashboard",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**DA3408 A4 \u00b7 AI image captioner (BLIP, CPU-only).** Read top to bottom: **1 Health** (is it up?) \u2192 **2 Application** (throughput \u00b7 latency \u00b7 errors) \u2192 **3 Clients** (who is calling) \u2192 **4 System** (node_exporter: CPU / RAM / disk) \u2192 **5 Correlation** (does a bulk upload move the hardware?).  \nColours are the colour-blind-safe Okabe-Ito palette; series also differ by **line style** (solid / dashed / dotted / dash-dot) so they survive greyscale print. Every panel has a title, subtitle, axis label with unit + scale (linear/log) and a story in its \u24d8 description. Refresh: 5 s."
+      },
+      "transparent": true
+    },
+    {
+      "id": 2,
+      "type": "row",
+      "title": "1 \u00b7 Health at a glance",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "App \u00b7 UP / DOWN",
+      "description": "UP / DOWN\n\nSTORY: Is Prometheus able to scrape the Streamlit app's /metrics? DOWN = app crashed or stopped.\n\nSCALE/UNITS: n/a (single value)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "up{job=\"python_app\"}",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "UP",
+                  "color": "#0072B2",
+                  "index": 0
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "#D55E00",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "node_exporter \u00b7 UP / DOWN",
+      "description": "UP / DOWN\n\nSTORY: System metrics source. DOWN = CPU/RAM/disk panels below go blank.\n\nSCALE/UNITS: n/a (single value)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 6,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "up{job=\"node\"}",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "UP",
+                  "color": "#0072B2",
+                  "index": 0
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "#D55E00",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Alerts \u00b7 firing now",
+      "description": "firing now\n\nSTORY: Count of alert rules currently firing (see rules.yml). 0 = healthy.\n\nSCALE/UNITS: n/a (single value)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "count(ALERTS{alertstate=\"firing\"}) or vector(0)",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              },
+              {
+                "color": "#D55E00",
+                "value": 1
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Model \u00b7 LOADED / NOT",
+      "description": "LOADED / NOT\n\nSTORY: BLIP weights resident in RAM. NOT LOADED = first request will be slow.\n\nSCALE/UNITS: n/a (single value)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 6,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "captioner_model_loaded",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "LOADED",
+                  "color": "#0072B2",
+                  "index": 0
+                },
+                "0": {
+                  "text": "NOT LOADED",
+                  "color": "#D55E00",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Active requests \u00b7 in progress now",
+      "description": "in progress now\n\nSTORY: Uploads currently being processed (single + bulk).\n\nSCALE/UNITS: n/a (single value)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(captioner_active_requests)",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              },
+              {
+                "color": "#E69F00",
+                "value": 2
+              },
+              {
+                "color": "#D55E00",
+                "value": 4
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Sessions \u00b7 browser tabs, last 5 min",
+      "description": "browser tabs, last 5 min\n\nSTORY: Distinct Streamlit sessions seen in the last 5 minutes.\n\nSCALE/UNITS: n/a (single value)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 9,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "captioner_recent_sessions",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "mappings": [],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Image error ratio \u00b7 last 1 min",
+      "description": "last 1 min\n\nSTORY: Failed images / all images over 1 min. Orange > 5 %, vermilion > 20 % (alert threshold).\n\nSCALE/UNITS: percent, 0-100 % (linear)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 9,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "(sum(rate(captioner_images_processed_total{status=\"error\"}[1m])) / (sum(rate(captioner_images_processed_total[1m])) > 0)) or vector(0)",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "mappings": [],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              },
+              {
+                "color": "#E69F00",
+                "value": 0.05
+              },
+              {
+                "color": "#D55E00",
+                "value": 0.2
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "Model memory \u00b7 RAM used by weights",
+      "description": "RAM used by weights\n\nSTORY: RSS growth when the model was loaded - the model's own footprint.\n\nSCALE/UNITS: bytes (IEC), single value",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 9,
+        "w": 6,
+        "h": 3
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "captioner_model_memory_bytes",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "mappings": [],
+          "noValue": "NO DATA",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 11,
+      "type": "row",
+      "title": "2 \u00b7 Application \u2014 Rate \u00b7 Errors \u00b7 Duration",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 12,
+      "type": "text",
+      "title": "Story",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Each image is one unit of work. **Throughput** shows how many are finished per second, **latency** how long each takes (log scale because bulk bursts spread values over decades), **errors** what is failing and **queue** how many images wait for the single model."
+      },
+      "transparent": true
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Throughput \u00b7 images per second by mode",
+      "description": "images per second by mode\n\nSTORY: Bulk uploads show as a plateau (steady CPU-bound rate); single uploads as short spikes.\n\nSCALE/UNITS: Images/s; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_images_processed_total{mode=\"single\",status=\"success\"}[15s]))",
+          "legendFormat": "Single",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_images_processed_total{mode=\"bulk\",status=\"success\"}[15s]))",
+          "legendFormat": "Bulk",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: img/s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Images/s (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 7
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Inference latency \u00b7 p50/p95/p99, log scale",
+      "description": "p50/p95/p99, log scale\n\nSTORY: p50 is the typical image; a p95/p99 that pulls away from p50 means queueing or oversized images.\n\nSCALE/UNITS: seconds; LOG10 Y axis (bucket-interpolated estimate, accurate to bucket width).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(captioner_inference_duration_seconds_bucket[1m])))",
+          "legendFormat": "p50 (median)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(captioner_inference_duration_seconds_bucket[1m])))",
+          "legendFormat": "p95",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(captioner_inference_duration_seconds_bucket[1m])))",
+          "legendFormat": "p99",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Latency, s (log)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "log",
+              "log": 10
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#D55E00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot",
+                  "dash": [
+                    2,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 8
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Mean latency \u00b7 s per image (Summary)",
+      "description": "s per image (Summary)\n\nSTORY: Mean = total inference seconds / images, per mode. Compare with the percentiles: mean >> p50 means a long tail.\n\nSCALE/UNITS: Mean s/image; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_client_inference_seconds_sum{mode=\"single\"}[1m])) / sum(rate(captioner_client_inference_seconds_count{mode=\"single\"}[1m]))",
+          "legendFormat": "Single",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_client_inference_seconds_sum{mode=\"bulk\"}[1m])) / sum(rate(captioner_client_inference_seconds_count{mode=\"bulk\"}[1m]))",
+          "legendFormat": "Bulk",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Mean s/image (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 7
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Errors \u00b7 failures per second by cause",
+      "description": "failures per second by cause\n\nSTORY: Flat at zero is healthy. Spikes name the cause: corrupt image, bad/empty ZIP, or a model failure.\n\nSCALE/UNITS: Errors/s; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 24,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_errors_total{error_type=\"invalid_image\"}[1m]))",
+          "legendFormat": "invalid image",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_errors_total{error_type=\"inference_error\"}[1m]))",
+          "legendFormat": "inference error",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_errors_total{error_type=~\"zip_.*|unreadable_entry\"}[1m]))",
+          "legendFormat": "ZIP problems",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: err/s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Errors/s (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#D55E00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 8
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#56B4E9"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot",
+                  "dash": [
+                    2,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 5
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Queue \u00b7 active vs waiting for model",
+      "description": "active vs waiting for model\n\nSTORY: Waiting > 0 means the one-at-a-time CPU model is saturated: users queue and latency rises.\n\nSCALE/UNITS: Count; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 24,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(captioner_active_requests)",
+          "legendFormat": "Active requests",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(captioner_waiting_for_model)",
+          "legendFormat": "Images waiting for model",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Count (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#D55E00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": "row",
+      "title": "3 \u00b7 Clients \u2014 who is using the app (custom labels)",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 19,
+      "type": "text",
+      "title": "Story",
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Metrics carry **client_ip**, **session_id** and **browser** labels. The table joins volume and mean latency per client; the bar chart ranks IPs; the time-series splits request rate by browser family (a bounded label, so cardinality stays low). Open the app from a phone/second browser to add clients."
+      },
+      "transparent": true
+    },
+    {
+      "id": 20,
+      "type": "table",
+      "title": "Clients \u00b7 per-IP volume and latency",
+      "description": "Per-client usage table\n\nSTORY: Who sent how many images and how fast they were served. Built from the labelled Counter and Summary (_sum/_count).\n\nSCALE/UNITS: images = count (linear); latency = seconds (linear).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (client_ip, mode) (captioner_client_images_total)",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (client_ip, mode) (captioner_client_inference_seconds_sum) / sum by (client_ip, mode) (captioner_client_inference_seconds_count)",
+          "legendFormat": "__auto",
+          "editorMode": "code",
+          "range": false,
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "client_ip": "Client IP",
+              "mode": "Mode",
+              "Value #A": "Images captioned (count)",
+              "Value #B": "Mean latency (s)"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mean latency (s)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 21,
+      "type": "bargauge",
+      "title": "By IP \u00b7 total images",
+      "description": "total images\n\nSTORY: Longer bar = heavier user. Different IPs appear when the app is opened from another device.\n\nSCALE/UNITS: linear bar length",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 36,
+        "w": 5,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum by (client_ip) (captioner_client_images_total)",
+          "legendFormat": "{{client_ip}}",
+          "editorMode": "code",
+          "range": false,
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "valueMode": "text",
+        "namePlacement": "top",
+        "sizing": "manual",
+        "minVizHeight": 24,
+        "maxVizHeight": 60,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "By browser \u00b7 requests per second",
+      "description": "requests per second\n\nSTORY: Splits traffic by User-Agent family: useful to spot a single scripted client (curl/python) generating load.\n\nSCALE/UNITS: Requests/s; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 17,
+        "y": 36,
+        "w": 7,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_client_requests_total{browser=\"chrome\"}[15s]))",
+          "legendFormat": "Chrome",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_client_requests_total{browser=\"firefox\"}[15s]))",
+          "legendFormat": "Firefox",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_client_requests_total{browser=~\"safari|edge\"}[15s]))",
+          "legendFormat": "Safari / Edge",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_client_requests_total{browser=~\"curl|python|other\"}[15s]))",
+          "legendFormat": "curl / python / other",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: req/s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Requests/s (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#009E73"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot",
+                  "dash": [
+                    2,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#CC79A7"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    12,
+                    6,
+                    2,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 7
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "type": "row",
+      "title": "4 \u00b7 System resources \u2014 node_exporter (Utilisation \u00b7 Saturation \u00b7 Errors)",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 44,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 24,
+      "type": "text",
+      "title": "Story",
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Hardware view from **node_exporter**. CPU is split into user/system/iowait; RAM and disk are shown with the app's own memory on a second axis; load per core above 1 means runnable work is queueing for a core."
+      },
+      "transparent": true
+    },
+    {
+      "id": 25,
+      "type": "timeseries",
+      "title": "CPU \u00b7 % busy, split by mode",
+      "description": "% busy, split by mode\n\nSTORY: A bulk ZIP drives user-mode CPU up for the whole batch; iowait stays low because the job is compute-bound.\n\nSCALE/UNITS: CPU %; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[15s])))",
+          "legendFormat": "Total busy",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * avg(rate(node_cpu_seconds_total{mode=\"user\"}[15s]))",
+          "legendFormat": "user",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * avg(rate(node_cpu_seconds_total{mode=\"system\"}[15s]))",
+          "legendFormat": "system",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * avg(rate(node_cpu_seconds_total{mode=\"iowait\"}[15s]))",
+          "legendFormat": "iowait",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "CPU % (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0,
+          "max": 100
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#000000"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot",
+                  "dash": [
+                    2,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#D55E00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    12,
+                    6,
+                    2,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 26,
+      "type": "timeseries",
+      "title": "Memory \u00b7 RAM % (L), app bytes (R)",
+      "description": "RAM % (L), app bytes (R)\n\nSTORY: RAM used % = 1 - available/total. App RSS (right axis) steps up when the model loads and on large ZIPs.\n\nSCALE/UNITS: RAM used %; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 48,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)",
+          "legendFormat": "Machine RAM used (%)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "process_resident_memory_bytes{job=\"python_app\"}",
+          "legendFormat": "App resident memory (bytes)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "RAM used % (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "App RSS, bytes (linear)"
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 27,
+      "type": "timeseries",
+      "title": "Disk \u00b7 used % (L), I/O bytes/s (R)",
+      "description": "used % (L), I/O bytes/s (R)\n\nSTORY: Used % is capacity pressure; read/write bytes/s show model-cache reads at startup and any swap or log writes.\n\nSCALE/UNITS: Disk used %; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 48,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * (1 - max(node_filesystem_avail_bytes{mountpoint=\"/\",fstype!=\"rootfs\"}) / max(node_filesystem_size_bytes{mountpoint=\"/\",fstype!=\"rootfs\"}))",
+          "legendFormat": "Root disk used (%)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(node_disk_read_bytes_total[15s]))",
+          "legendFormat": "Disk read (B/s)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(node_disk_written_bytes_total[15s]))",
+          "legendFormat": "Disk write (B/s)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Disk used % (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "Bps"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "I/O, bytes/s (linear)"
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#D55E00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dot",
+                  "dash": [
+                    2,
+                    6
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "Bps"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "I/O, bytes/s (linear)"
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "type": "timeseries",
+      "title": "Saturation \u00b7 1-min load per core",
+      "description": "1-min load per core\n\nSTORY: Above 1.0 means more runnable threads than cores: work is waiting. Normalised by core count so it is comparable across machines.\n\nSCALE/UNITS: Load/core; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "node_load1 / scalar(count(count by (cpu) (node_cpu_seconds_total)))",
+          "legendFormat": "load1 per core",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Load/core (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 29,
+      "type": "timeseries",
+      "title": "Network \u00b7 bytes/s in and out",
+      "description": "bytes/s in and out\n\nSTORY: Shows uploads from other devices (LAN). Uploads from this same machine use loopback and are not counted here.\n\nSCALE/UNITS: Network, B/s; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 56,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(node_network_receive_bytes_total{device!~\"lo|veth.*|docker.*|br-.*\"}[15s]))",
+          "legendFormat": "Receive (B/s)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|docker.*|br-.*\"}[15s]))",
+          "legendFormat": "Transmit (B/s)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Network, B/s (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 30,
+      "type": "row",
+      "title": "5 \u00b7 Correlation \u2014 application load vs hardware",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 63,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "id": 31,
+      "type": "text",
+      "title": "Story",
+      "gridPos": {
+        "x": 0,
+        "y": 64,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**The point of the assignment:** each panel overlays an application metric (left axis) on a hardware metric (right axis) with a shared crosshair. Start a bulk ZIP and watch throughput/active requests rise **together with** CPU; when the batch ends both fall back."
+      },
+      "transparent": true
+    },
+    {
+      "id": 32,
+      "type": "timeseries",
+      "title": "Throughput vs CPU \u00b7 img/s (L), CPU % (R)",
+      "description": "img/s (L), CPU % (R)\n\nSTORY: Throughput rising and CPU rising together proves the workload is CPU-bound.\n\nSCALE/UNITS: Images/s; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 67,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(rate(captioner_images_processed_total{status=\"success\"}[15s]))",
+          "legendFormat": "Throughput (img/s)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[15s])))",
+          "legendFormat": "Machine CPU busy (%)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: img/s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Images/s (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#D55E00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "CPU busy % (linear)"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 33,
+      "type": "timeseries",
+      "title": "Active requests vs app CPU \u00b7 count (L), % of one core (R)",
+      "description": "count (L), % of one core (R)\n\nSTORY: App CPU (100 % = one core fully used) tracks active requests; values over 100 % mean multi-threaded inference.\n\nSCALE/UNITS: Active requests; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 67,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "sum(captioner_active_requests)",
+          "legendFormat": "Active requests",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * rate(process_cpu_seconds_total{job=\"python_app\"}[15s])",
+          "legendFormat": "App CPU (% of one core)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Active requests (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "App CPU, % of 1 core (linear)"
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": "timeseries",
+      "title": "p95 latency vs CPU \u00b7 seconds (L), CPU % (R)",
+      "description": "seconds (L), CPU % (R)\n\nSTORY: When CPU saturates, p95 latency climbs: the dashboard's saturation-to-user-impact link.\n\nSCALE/UNITS: p95 latency, s; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 76,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(captioner_inference_duration_seconds_bucket[1m])))",
+          "legendFormat": "p95 latency (s)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[15s])))",
+          "legendFormat": "Machine CPU busy (%)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "p95 latency, s (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#D55E00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "CPU busy % (linear)"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "type": "timeseries",
+      "title": "Bulk progress vs memory \u00b7 % done (L), app bytes (R)",
+      "description": "% done (L), app bytes (R)\n\nSTORY: Progress climbs 0 \u2192 100 % per ZIP; memory should plateau (no leak). A steady upward drift across batches would signal a leak.\n\nSCALE/UNITS: Batch %; linear Y axis; X axis = time (local).",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 76,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "100 * captioner_batch_progress_ratio",
+          "legendFormat": "Batch progress (%)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${ds}"
+          },
+          "expr": "process_resident_memory_bytes{job=\"python_app\"}",
+          "legendFormat": "App resident memory (bytes)",
+          "editorMode": "code",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "lineInterpolation": "linear",
+            "showPoints": "always",
+            "pointSize": 4,
+            "fillOpacity": 0,
+            "axisPlacement": "left",
+            "axisLabel": "Batch % (linear)",
+            "axisColorMode": "text",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "axisSoftMin": 0
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#0072B2"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#0072B2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#0072B2"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E69F00"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 6
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "App RSS, bytes (linear)"
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    }
+  ]
+}

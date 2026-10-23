@@ -1,0 +1,35 @@
+vrishab-av@vrishab-av:/media/WindowsC/Users/vrish/Documents/IIT/AIDA/Sem 5/DA3408 - AI Ops Lab/Assignment 4/da3408-a4-monitoring$ python3 -c "import http.server as h; h.HTTPServer(('127.0.0.1',5001),type('H',(h.BaseHTTPRequestHandler,),{'do_POST':lambda s:(print(s.rfile.read(int(s.headers['Content-Length'])).decode()[:300],flush=True),s.send_response(200),s.end_headers())})).serve_forever()"
+{"receiver":"web\\.hook","status":"firing","alerts":[{"status":"firing","labels":{"alertname":"HighCPUDuringProcessing","severity":"warning"},"annotations":{"summary":"CPU above 40% for 10 s"},"startsAt":"2026-10-22T22:40:11.697Z","endsAt":"0001-01-01T00:00:00Z","generatorURL":"http://vrishab-av:909
+127.0.0.1 - - [23/Oct/2026 04:10:16] "POST / HTTP/1.1" 200 -
+{"receiver":"web\\.hook","status":"resolved","alerts":[{"status":"resolved","labels":{"alertname":"HighCPUDuringProcessing","severity":"warning"},"annotations":{"summary":"CPU above 40% for 10 s"},"startsAt":"2026-10-22T22:40:11.697Z","endsAt":"2026-10-22T22:40:38.697Z","generatorURL":"http://vrisha
+127.0.0.1 - - [23/Oct/2026 04:10:41] "POST / HTTP/1.1" 200 -
+{"receiver":"web\\.hook","status":"firing","alerts":[{"status":"firing","labels":{"alertname":"HighCPUDuringProcessing","severity":"warning"},"annotations":{"summary":"CPU above 40% for 10 s"},"startsAt":"2026-10-22T22:42:05.697Z","endsAt":"0001-01-01T00:00:00Z","generatorURL":"http://vrishab-av:909
+127.0.0.1 - - [23/Oct/2026 04:12:10] "POST / HTTP/1.1" 200 -
+{"receiver":"web\\.hook","status":"resolved","alerts":[{"status":"resolved","labels":{"alertname":"HighCPUDuringProcessing","severity":"warning"},"annotations":{"summary":"CPU above 40% for 10 s"},"startsAt":"2026-10-22T22:42:05.697Z","endsAt":"2026-10-22T22:42:34.697Z","generatorURL":"http://vrisha
+127.0.0.1 - - [23/Oct/2026 04:12:35] "POST / HTTP/1.1" 200 -
+{"receiver":"web\\.hook","status":"firing","alerts":[{"status":"firing","labels":{"alertname":"CaptionerAppDown","instance":"localhost:18000","job":"python_app","severity":"critical"},"annotations":{"summary":"Captioning app metrics endpoint is down"},"startsAt":"2026-10-22T22:47:03.697Z","endsAt":"
+127.0.0.1 - - [23/Oct/2026 04:17:08] "POST / HTTP/1.1" 200 -
+{"receiver":"web\\.hook","status":"firing","alerts":[{"status":"firing","labels":{"alertname":"CaptionerAppDown","instance":"localhost:18000","job":"python_app","severity":"critical"},"annotations":{"summary":"Captioning app metrics endpoint is down"},"startsAt":"2026-10-22T22:47:03.697Z","endsAt":"
+127.0.0.1 - - [23/Oct/2026 04:17:38] "POST / HTTP/1.1" 200 -
+{"receiver":"web\\.hook","status":"resolved","alerts":[{"status":"resolved","labels":{"alertname":"CaptionerAppDown","instance":"localhost:18000","job":"python_app","severity":"critical"},"annotations":{"summary":"Captioning app metrics endpoint is down"},"startsAt":"2026-10-22T22:47:03.697Z","endsA
+127.0.0.1 - - [23/Oct/2026 04:17:58] "POST / HTTP/1.1" 200 -
+^CTraceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import http.server as h; h.HTTPServer(('127.0.0.1',5001),type('H',(h.BaseHTTPRequestHandler,),{'do_POST':lambda s:(print(s.rfile.read(int(s.headers['Content-Length'])).decode()[:300],flush=True),s.send_response(200),s.end_headers())})).serve_forever()
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/socketserver.py", line 235, in serve_forever
+    ready = selector.select(poll_interval)
+  File "/usr/lib/python3.14/selectors.py", line 398, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt
+
+vrishab-av@vrishab-av:/media/WindowsC/Users/vrish/Documents/IIT/AIDA/Sem 5/DA3408 - AI Ops Lab/Assignment 4/da3408-a4-monitoring$ ./run.sh stop
+stopped alertmanager
+stopped grafana
+stopped node_exporter
+stopped prometheus
+stopped streamlit
+vrishab-av@vrishab-av:/media/WindowsC/Users/vrish/Documents/IIT/AIDA/Sem 5/DA3408 - AI Ops Lab/Assignment 4/da3408-a4-monitoring$ ./run.sh reset
+wiped /media/WindowsC/Users/vrish/Documents/IIT/AIDA/Sem 5/DA3408 - AI Ops Lab/Assignment 4/da3408-a4-monitoring/.run  (model cache /media/WindowsC/Ubuntu_Cache/huggingface kept)
+vrishab-av@vrishab-av:/media/WindowsC/Users/vrish/Documents/IIT/AIDA/Sem 5/DA3408 - AI Ops Lab/Assignment 4/da3408-a4-monitoring$ 
+

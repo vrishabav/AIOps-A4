@@ -1,0 +1,18 @@
+# Based on the class sample_alertmanager.yml. The receiver is a local listener on :5001; run it with
+#   python3 -c "import http.server as h; h.HTTPServer(('127.0.0.1',5001),type('H',(h.BaseHTTPRequestHandler,),{'do_POST':lambda s:(print(s.rfile.read(int(s.headers['Content-Length'])).decode()[:300],flush=True),s.send_response(200),s.end_headers())})).serve_forever()"
+route:
+  group_by: ['alertname']
+  group_wait: 5s
+  group_interval: 5s
+  repeat_interval: 30s
+  receiver: 'web.hook'
+receivers:
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://127.0.0.1:5001/'
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

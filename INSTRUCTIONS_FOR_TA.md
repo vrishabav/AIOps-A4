@@ -4,8 +4,6 @@ Everything to grade is in this repository root (no nested project folder). `READ
 setup and run commands; this file says where to look for each rubric item, what a correct run looks like, and where the
 recorded evidence is.
 
-**Videos:** demo with explanation (4–5 min) — *link*  ·  dashboard at 5 s refresh (about 1 min) — *link*
-
 ## 1. Where to look, by rubric item
 
 | Rubric item (marks) | Files | Live check (after starting the stack, see README "Run") |
@@ -16,7 +14,7 @@ recorded evidence is.
 | Application logic (10) | `app.py` (UI), `pipeline.py` (single and ZIP processing); `make_sample_zips.py` creates the test uploads | http://localhost:8501 |
 | AI disclosure / PromQL attribution | README "AI disclosure"; prompt logs in the headers of `rules.yml` and `build_dashboard.py`; every query explained in README "Query logic" | — |
 
-## 2. Quick evaluation run (about 10 minutes)
+## 2. Quick eval run
 
 Set up and start as in the README, then open http://localhost:8501 once (the metrics server and model start with the first
 browser session). Expected results:
